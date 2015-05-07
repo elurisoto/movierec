@@ -8,7 +8,6 @@ def pullFromCSV(filename):
 	with open(filename) as csvfile:
 		reader = csv.DictReader(csvfile)
 		for row in reader:
-			title = row["Name"]
 			titles.append([(row["Name"]).decode('utf-8'), row["Year"]])
 
 	return titles
@@ -23,7 +22,7 @@ def download(titles):
 	for i,movie in enumerate(titles):
 		response = omdb.title(movie[0],year=movie[1], tomatoes=True)
 		if response:
-			data.append(response) # For some movies it doesnt answer, don't know why
+			data.append(response) # For some movies with numbers in the title it doesnt answer, don't know why
 		progress = (i+1.0)/total
 		sys.stdout.write("\r[" + "=" * (int(round((progress*size)))-1) +">" +  " " * int(round((1-progress)*size)) + "]"+  str(progress*100) + "%")
 		sys.stdout.flush()
