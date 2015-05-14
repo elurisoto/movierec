@@ -51,8 +51,17 @@ def addaptFormat(data):
 
 	return data
 
+def save(data, filename):
+	with open(filename, 'w') as csvfile:
+		writer = csv.DictWriter(csvfile, data[0].keys())
+
+		writer.writeheader()
+		for movie in data:
+			writer.writerow({key:movie[key] for key in movie.keys()})
+
 if __name__=="__main__":
 	data = loadCSV("data/output.csv")
 	data = addaptFormat(data)
+	save(data, "data/outputPreprocessed.csv")
 
 
