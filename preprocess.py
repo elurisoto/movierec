@@ -40,11 +40,12 @@ def processOscars(text):
 	return numOscars
 
 
-# Changes the format of some rows to make the data more easy to compute
-def addaptFormat(data):
+# Changes the format of some rows to make the data easier to compute
+def adaptFormat(data):
 	for row in data:
 		row['imdb_votes'] = row['imdb_votes'].replace(',','')
 		row['box_office'] = row['box_office'].replace('$','').replace('M','')
+		row['runtime'] = row['runtime'].replace(' min','')
 		genres = convertGenres(row['genre'])
 		row.update(genres)
 		row['oscars'] = processOscars(row['awards'])
@@ -61,7 +62,7 @@ def save(data, filename):
 
 if __name__=="__main__":
 	data = loadCSV("data/output.csv")
-	data = addaptFormat(data)
+	data = adaptFormat(data)
 	save(data, "data/outputPreprocessed.csv")
 
 
