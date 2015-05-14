@@ -1,8 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
-def getSearchURL(title,year):
-	return "http://www.filmaffinity.com/en/advsearch.php?stext=" + title + "&fromyear=" + str(year) + "&toyear=" +str(year)
+def getSearchURL(title,fromyear,toyear):
+	return "http://www.filmaffinity.com/en/advsearch.php?stext=" + title + "&fromyear=" + str(fromyear) + "&toyear=" +str(toyear)
 
 
 def getMovieURL(searchURL):
@@ -13,8 +13,12 @@ def getMovieURL(searchURL):
 	data = r.text
 	soup = BeautifulSoup(data)
 
-	moviedata = soup.find("div",{"class":"mc-title"}).find('a')
-	return "http://www.filmaffinity.com" + moviedata['href']
+	moviedata = soup.find("div",{"class":"mc-title"})
+	if moviedata:
+		moviedata = moviedata.find('a')
+		return "http://www.filmaffinity.com" + moviedata['href']
+	else:
+		return None
 
 
 def getRating(movieURL):
@@ -29,7 +33,15 @@ def getRating(movieURL):
 	return float(rating.strip())
 
 def FARating(title,year):
-	searchurl = getSearchURL(title, year)
+	searchurl = getSearchURL(title, year,year)
 	movieurl = getMovieURL(searchurl)
-	return getRating(movieurl)
+	if movieurl:
+		return getRating(movieurl)
+	else:
+		searchurl = getSearchURL(title, year-1, year+1)
+		movieurl = getMovieURL(searchurl)
+		if movieurl:
+			return getRating(movieurl)
+		else:
+			return None
 
