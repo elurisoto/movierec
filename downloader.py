@@ -25,17 +25,13 @@ def generateData(titles):
 		response = omdb.title(movie[0],year=movie[1], tomatoes=True)
 		if response:
 			if response['tomato_rating'] != 'N/A':
-
 				FA = FARating(movie[0],movie[1])
 				response['FA_rating']=str(FA)
 				response['user_rating'] = movie[2]
-				response['imdb_votes'] = response['imdb_votes'].replace(',','')
-				response['box_office'] = response['box_office'].replace('$','').replace('M','')
-
 				data.append(response) 
 		progress = (i+1.0)/total
 		sys.stdout.write("\r[" + "=" * (int(round((progress*size)))-1) +">" +  " " * int(round((1-progress)*size)) 
-						+ "] "+ str(i+1) + "/" + str(total) + " (" + str(progress*100) + "%)")
+						+ "] "+ str(i+1) + "/" + str(total))
 		sys.stdout.flush()
 		
 	print
@@ -63,4 +59,4 @@ def pullAndSave(movieListPath, outputFile):
 	writeCSV(data,outputFile)
 
 if __name__ == "__main__":
-	pullAndSave("data/lbxd/ratings.csv","data/output.csv")
+	pullAndSave("data/alex/ratings.csv","data/outputAlex.csv")
