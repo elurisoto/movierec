@@ -56,10 +56,8 @@ def processBoxOffice(text):
 # and delete some string rows since matlab doesn't like them.
 def adaptFormat(data):
 	for row in data:
-		row['imdb_votes'] = row['imdb_votes'].replace(',','')
 		
 		row['runtime'] = row['runtime'].replace(' min','')
-		row['imdb_id'] = row['imdb_id'].replace('tt','')
 		genres = convertGenres(row['genre'])
 		row.update(genres)
 		row['oscars'] = processOscars(row['awards'])
@@ -68,17 +66,21 @@ def adaptFormat(data):
 		del row['awards']
 		del row['genre']
 		del row['title']
-		del row['country']
 
 	return data
 
 def save(data, filename):
 	with open(filename, 'w') as csvfile:
-		writer = csv.DictWriter(csvfile, data[0].keys())
 
+
+		keys = data[0].keys()
+		keys.remove('user_rating')
+		keys.append('user_rating')
+
+		writer = csv.DictWriter(csvfile, keys)
 		writer.writeheader()
 		for movie in data:
-			writer.writerow({key:movie[key] for key in movie.keys()})
+			writer.writerow({key:movie[key] for key in keys})
 
 if __name__=="__main__":
 	data = loadCSV("data/outputAlex.csv")

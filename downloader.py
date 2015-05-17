@@ -42,9 +42,9 @@ def writeCSV(data, filename):
 
 	with open(filename, 'w') as csvfile:
 		
-		fieldsToSave = ['title','year','metascore','FA_rating','tomato_rating','tomato_meter','tomato_rotten',
-						'tomato_user_meter','tomato_fresh','imdb_votes','tomato_user_reviews','imdb_id','tomato_reviews',
-						'awards','tomato_user_rating','genre','imdb_rating','country','runtime','box_office','user_rating']
+		fieldsToSave = ['title','year','metascore','FA_rating','tomato_rating','tomato_meter',
+						'tomato_user_meter','awards','tomato_user_rating','genre','imdb_rating',
+						'runtime','box_office','user_rating']
 
 		writer = csv.DictWriter(csvfile, fieldnames=fieldsToSave)
 
