@@ -66,6 +66,7 @@ def adaptFormat(data):
 		del row['awards']
 		del row['genre']
 		del row['title']
+		del row['box_office'] #This is temporary
 
 	return data
 

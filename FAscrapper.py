@@ -38,7 +38,7 @@ def FARating(title,year):
 	if movieurl:
 		return getRating(movieurl)
 	else:
-		searchurl = getSearchURL(title, year-1, year+1)
+		searchurl = getSearchURL(title, int(year)-1, int(year)+1)
 		movieurl = getMovieURL(searchurl)
 		if movieurl:
 			return getRating(movieurl)
