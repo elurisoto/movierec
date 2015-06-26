@@ -63,10 +63,10 @@ def adaptFormat(data):
 		row['oscars'] = processOscars(row['awards'])
 		row['box_office'] = processBoxOffice(row['box_office'])
 
-		del row['awards']
-		del row['genre']
-		del row['title']
-		del row['box_office'] #This is temporary
+		# del row['awards']
+		# del row['genre']
+		# del row['title']
+		# del row['box_office'] #This is temporary
 
 	return data
 
