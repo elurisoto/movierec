@@ -5,17 +5,17 @@ import csv,copy, re
 #############################################################################
 
 possibleGenres = {
-'Action':		0,		'Adventure':	0,
-'Animation':	0,		'Biography':	0,
-'Comedy':		0,		'Crime':		0,
-'Documentary':	0,		'Drama':		0,
-'Family':		0,		'Fantasy':		0,
-'Film-Noir':	0,		'History':		0,
-'Horror':		0,		'Music':		0,
-'Musical':		0,		'Mystery':		0,
-'Romance':		0,		'Sci-Fi':		0,
-'Sport':		0,		'Thriller':		0,
-'War':			0,		'Western':		0
+'Action':		False,		'Adventure':	False,
+'Animation':	False,		'Biography':	False,
+'Comedy':		False,		'Crime':		False,
+'Documentary':	False,		'Drama':		False,
+'Family':		False,		'Fantasy':		False,
+'Film-Noir':	False,		'History':		False,
+'Horror':		False,		'Music':		False,
+'Musical':		False,		'Mystery':		False,
+'Romance':		False,		'Sci-Fi':		False,
+'Sport':		False,		'Thriller':		False,
+'War':			False,		'Western':		False
 }
 
 oscarsRE = re.compile("Won (?:\d*\.)?\d+ Oscar")
@@ -32,7 +32,7 @@ def convertGenres(genres):
 	genres = genres.replace(' ','').split(',')
 	dictionary = copy.copy(possibleGenres)
 	for genre in genres:
-		dictionary[genre] = 1
+		dictionary[genre] = True
 	return dictionary
 
 # Returns the number of oscars that a movie recieved
@@ -52,6 +52,8 @@ def processBoxOffice(text):
 	else:
 		return text
 
+def processIMDBVotes(text):
+	return text.replace(',','')
 # Changes the format of some rows to make the data easier to compute 
 # and delete some string rows since matlab doesn't like them.
 def adaptFormat(data):
@@ -62,6 +64,7 @@ def adaptFormat(data):
 		row.update(genres)
 		row['oscars'] = processOscars(row['awards'])
 		row['box_office'] = processBoxOffice(row['box_office'])
+		row['imdb_votes'] = processIMDBVotes(row['imdb_votes'])
 
 		# del row['awards']
 		# del row['genre']

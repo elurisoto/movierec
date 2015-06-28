@@ -1,6 +1,6 @@
 format bank;
 data = importData('data/outputAlexPreprocessed.csv');
-target = data(:,30)
+target = data(:,30):
 
 %target = importTarget('data/outputAlexPreprocessed.csv');
 
@@ -8,6 +8,6 @@ target = data(:,30)
 %la de filmaffinity y la de los usuarios de rotten tomatoes
 data = data(:,[1,18,27]);
 
-data = data';
-results = myNeuralNetworkFunction(data);
+results = myNeuralNetworkFunction(data');
 MSE = sum((results - target').^2)/length(results);
+errormedio = sum(abs(results-target'))/length(results)

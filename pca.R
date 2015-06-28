@@ -25,3 +25,10 @@ g <- g + scale_color_discrete(name = '')
 g <- g + theme(legend.direction = 'horizontal', 
 							 legend.position = 'top')
 print(g)
+
+write.csv(imputed, "data/imputados.csv")
+write.csv(numerics.pca$x, "data/pca/data.csv")
+write.csv(numerics.pca$scale, "data/pca/scale.csv")
+write.csv(numerics.pca$center, "data/pca/center.csv")
+write.csv(numerics.pca$rotation, "data/pca/rotation.csv")
+# To project new data into the new space: scale(newdata,pca$center,pca$scale) %*% pca$rotation 
