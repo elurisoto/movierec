@@ -31,8 +31,27 @@ textClusters.info <- function(results){
 	for(i in clusters){
 		cat("Cluster ", i, ":", names(sort(results$prototypes[i,],decreasing=TRUE))[1:10],"\n")
 	}
-	hist(results$cluster, breaks=numclusters)
+	hist(results$cluster)
 	
 }
 
+imputados <- read.csv("data//imputados.csv")
+data <- read.csv("data/outputAlexPreprocessed.csv", header = TRUE, 
+								 na.strings = c("N/A","None","NA"), stringsAsFactors=FALSE)
+data[is.na(data$tomato_consensus),]$tomato_consensus <- "No_review"
 
+for(numclusters in 16:25){
+	print(numclusters)
+	results <- textClusters(numclusters, paste(data$plot,data$tomato_consensus))
+	
+	write.csv(results$cluster, paste("data/clusters/",numclusters, ".csv", sep="") 
+						,row.names = FALSE)
+	
+}
+# numclusters <- 5
+# 
+# 
+# results <- textClusters(numclusters, paste(data$plot,data$tomato_consensus))
+# imputados$Clusters <- results$cluster
+# # imputados$plotClusters <- textClusters(numclusters, data$plot)$cluster
+# write.csv(imputados, "data/imp_textmining_combined.csv", row.names = FALSE)
