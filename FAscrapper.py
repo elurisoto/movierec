@@ -29,8 +29,12 @@ def getRating(movieURL):
 	data = r.text
 	soup = BeautifulSoup(data)
 
-	rating = soup.find(id="movie-rat-avg").get_text()
-	return float(rating.strip())
+	rating = soup.find(id="movie-rat-avg")
+	if rating:
+		rating = rating.get_text()
+		return float(rating.strip())
+	else:
+		return "N/A"
 
 def FARating(title,year):
 	searchurl = getSearchURL(title, year,year)
