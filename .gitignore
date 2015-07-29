@@ -1,4 +1,5 @@
 .DS_Store
 Quimica/
-data/
+data/*
+!data/ml-latest-small/*
 *.pyc
