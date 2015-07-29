@@ -5,7 +5,6 @@ library(Matrix)
 library(tm)
 library(SnowballC) 
 
-
 ## Genre matrix
 genres <- c("Action", "Adventure", "Animation", "Children", 
 						"Comedy", "Crime", "Documentary", "Drama", "Fantasy", 
@@ -32,7 +31,7 @@ getGenreMatrix <- function(){
 	l <- lapply(as.character(movieData$genres), getGenres)
 	df <-as.data.frame(do.call(rbind, l))
 	df$movieId <- 1:nrow(df)
-	df
+	df*1
 }
 
 count = function(x) {
@@ -92,9 +91,6 @@ getSynopsisMatrix <- function(){
 	as.matrix(dtm_tfidf)
 }
 
-# genreMatrix <- getGenreMatrix()
-# contributorsMatrix <- getContributorsMatrix()
-# synopsisMatrix <- getSynopsisMatrix()
 
 write.csv(getGenreMatrix(), "data/ml-latest-small/genreMatrix.csv", row.names = FALSE)
 write.csv(getContributorsMatrix(), "data/ml-latest-small/contributorMatrix.csv", row.names = FALSE)
