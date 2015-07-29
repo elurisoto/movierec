@@ -1,30 +1,74 @@
 # This file contains the functions necessary to obtain the 3 main matrixes used:
 # The genre, contributors, and synopsis matrix
 library(rPython)
+library(data.table)
+library(Matrix)
+
 
 ## Genre matrix
-getMovieData <- function(){
-	movieData <- read.csv(file = "data/ml-100k/u.item", header = FALSE, sep="|")
-	names(movieData) <- c("code", "title", "date", "url", "unknown", "Action", 
-												"Adventure", "Animation", "Children's", "Comedy", "Crime", 
-												"Documentary", "Drama", "Fantasy", "Film-Noir", "Horror", 
-												"Musical", "Mystery", "Romance", "Sci-Fi", "Thriller", 
-												"War", "Western")
-	movieData
+genres <- c("Action", "Adventure", "Animation", "Children", 
+						"Comedy", "Crime", "Documentary", "Drama", "Fantasy", 
+						"Film-Noir", "Horror", "Musical", "Mystery", "Romance", 
+						"Sci-Fi", "Thriller", "War", "Western", "IMAX")
+emptyGenres = rep(FALSE, length(genres))
+names(emptyGenres) <- genres
+
+
+getGenres <- function(x){
+	aux = emptyGenres
+	x <- strsplit(x, split="|", fixed=TRUE)[[1]]
+	for(i in 1:length(x)){
+		if(x[i] != "(no genres listed)")
+			aux[x[i]] = TRUE
+	}
+	aux
 }
 
-getGenreMatrix <- function(movieData){
-	movieData[5:23]
+
+getGenreMatrix <- function(){
+
+	movieData <- read.csv(file = "data/ml-latest-small/movies.csv", header = TRUE, sep=",")
+	l <- lapply(as.character(movieData$genres), getGenres)
+	df <-as.data.frame(do.call(rbind, l))
+	df$movieId <- 1:nrow(df)
+	df
 }
+
+count = function(x) {
+	data.table(x)[, .N, keyby = x]
+}
+
+
 
 # Contributors matrix
-# To download the contributors we will use a python function that downloads metadata
-# for the movies, and then select the contributors.
+getContributorsMatrix <- function(){
+	metadata <- read.csv("data/ml-latest-small/metadata.csv", header=TRUE, na.strings = "N/A")
+	contributors <- paste(metadata$actors, metadata$writer, metadata$director, sep=", ")
+	
+	# Remove parentheses
+	contributors <- gsub( " *\\(.*?\\) *", "", contributors)
 
-getMetadata <- function(movieData){
-	python.load('FAscrapper.py')
-	python.load('getMetadata.py')
-	metadata <- python.call('generateData', as.character(movieData$url))
-	metadata
+	# Now count which contributors appear in more than two movies
+	contributors <- lapply(contributors, function(x) strsplit(x, split=", ", fixed=TRUE)[[1]])
+	c <- unlist(c)
+	c <- c[c != "NA"]
+	
+	appearances <- count(c)
+	selected <- appearances$N > 2 & !duplicated(appearances$x)
+	selected.names <- appearances[selected]$x
+	
+	# Generate the sparse matrix
+	m <- Matrix(0, ncol = length(selected.names)+1, nrow=nrow(metadata), sparse=TRUE, 
+							dimnames=list(as.character(1:nrow(metadata)),c("movieId",selected.names)))	
+	
+	m[,"movieId"] <- 1:8570
+	
+	for(i in 1:length(contributors)){
+		l <- contributors[i][[1]][contributors[i][[1]] %in% colnames(m)]
+		m[i,l] = m[i,l] +1
+	}
+	
+	m
 }
-metadata <- getMetadata(movieData)
+
+
