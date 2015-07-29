@@ -1,8 +1,9 @@
 # This file contains the functions necessary to obtain the 3 main matrixes used:
 # The genre, contributors, and synopsis matrix
-library(rPython)
 library(data.table)
 library(Matrix)
+library(tm)
+library(SnowballC) 
 
 
 ## Genre matrix
@@ -38,8 +39,6 @@ count = function(x) {
 	data.table(x)[, .N, keyby = x]
 }
 
-
-
 # Contributors matrix
 getContributorsMatrix <- function(){
 	metadata <- read.csv("data/ml-latest-small/metadata.csv", header=TRUE, na.strings = "N/A")
@@ -68,7 +67,36 @@ getContributorsMatrix <- function(){
 		m[i,l] = m[i,l] +1
 	}
 	
-	m
+	as.matrix(m)
 }
 
+getSynopsisMatrix <- function(){
+	metadata <- read.csv("data/ml-latest-small/metadata.csv", header=TRUE, 
+											 stringsAsFactors = FALSE, na.strings = "N/A")
+	text <- metadata$plot
+	text[is.na(text)] = "noplot"
+	corpus <- VCorpus(VectorSource(text))
+	corpus <- tm_map(corpus, content_transformer(tolower))
+	corpus <- tm_map(corpus, removeWords, stopwords("english"))
+	corpus <- tm_map(corpus, removeNumbers)
+	corpus <- tm_map(corpus, stripWhitespace)
+	corpus <- tm_map(corpus, removePunctuation)
+	corpus <- tm_map(corpus, stemDocument)
+	corpus <- tm_map(corpus, stripWhitespace)
+	
+	dtm <- DocumentTermMatrix(corpus)
+	
+	# Only save terms that appear in 5 or more movies
+	dtm <- dtm[,findFreqTerms(dtm,5)]
+	dtm_tfidf <- weightTfIdf(dtm)
+	as.matrix(dtm_tfidf)
+}
+
+# genreMatrix <- getGenreMatrix()
+# contributorsMatrix <- getContributorsMatrix()
+# synopsisMatrix <- getSynopsisMatrix()
+
+write.csv(getGenreMatrix(), "data/ml-latest-small/genreMatrix.csv", row.names = FALSE)
+write.csv(getContributorsMatrix(), "data/ml-latest-small/contributorMatrix.csv", row.names = FALSE)
+write.csv(getSynopsisMatrix(), "data/ml-latest-small/synopsisMatrix.csv", row.names = FALSE)
 
