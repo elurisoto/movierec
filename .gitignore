@@ -1,5 +1,5 @@
 .DS_Store
 Quimica/
 data/*
-!data/ml-latest-small/*
+!data/ml-latest-small
 *.pyc
