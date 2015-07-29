@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re, omdb, sys, requests, csv
+import re, omdb, sys, requests
 from bs4 import BeautifulSoup
-from preprocess import loadCSV
+from preprocess import loadCSV, save
 from FAscrapper import *
 
 regex = re.compile("(tt\d{7})")
@@ -62,12 +62,9 @@ def generateDataFromURL(urls):
 	for i,url in enumerate(urls):
 		progress = (i+1.0)/total
 		print str(i) + " " + str(len(data)) + " [" + str(progress) + "] " + url
-		if i != len(data):
-			print "DESIGUALDAD"
 		code = getCode(url)
 		if code:
 			response = omdb.imdbid(code, tomatoes=True, fullplot=True)
-			print response
 			if response:
 				FA = FARating(response['title'],response['year'])
 				response['FA_rating']=str(FA)
@@ -99,6 +96,9 @@ def generateDataFromID(ids):
 
 		response = omdb.imdbid("tt" + link['imdbId'], tomatoes=True, fullplot=True)
 		if response:
+			response['year']= response['year'].encode('utf-8')
+			response['year'] = response['year'].replace('–',"")		#Weird special case
+
 			FA = FARating(response['title'],response['year'])
 			response['FA_rating']=str(FA)
 			response['movieId'] = link['movieId']

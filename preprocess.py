@@ -78,13 +78,11 @@ def save(data, filename):
 
 
 		keys = data[0].keys()
-		keys.remove('user_rating')
-		keys.append('user_rating')
 
 		writer = csv.DictWriter(csvfile, keys)
 		writer.writeheader()
 		for movie in data:
-			writer.writerow({key:movie[key] for key in keys})
+			writer.writerow({key:movie[key].encode('utf-8') for key in keys})
 
 if __name__=="__main__":
 	data = loadCSV("data/outputAlex.csv")

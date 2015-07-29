@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 from bs4 import BeautifulSoup
 
@@ -37,6 +39,7 @@ def getRating(movieURL):
 		return "N/A"
 
 def FARating(title,year):
+
 	searchurl = getSearchURL(title, year,year)
 	movieurl = getMovieURL(searchurl)
 	if movieurl:
