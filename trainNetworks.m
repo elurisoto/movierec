@@ -20,5 +20,5 @@ for j=1:iter
     total = total + aux/folds;
 end
 
-total
+total/iter;
 

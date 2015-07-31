@@ -17,9 +17,9 @@ for neuronas=1:1:15
     datos = join(ratings(:,'movieId'),genres);
     datos = table2array(datos(:,2:20))';
     % Funciones
-    mse = trainNetworks(datos, target, iteraciones, neuronas, folds)
+    mse.genre = trainNetworks(datos, target, iteraciones, neuronas, folds)
    
-    fprintf('%i neuron(s): \t %f\n', neuronas, mse)
-    genresMSE = [genresMSE mse];
+    fprintf('%i neuron(s): \t %f\n', neuronas, mse.genre)
+    genresMSE = [genresMSE mse.genre];
 end
 save('data/workspace.mat')
