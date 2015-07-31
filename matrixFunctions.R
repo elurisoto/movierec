@@ -28,9 +28,10 @@ getGenres <- function(x){
 getGenreMatrix <- function(){
 
 	movieData <- read.csv(file = "data/ml-latest-small/movies.csv", header = TRUE, sep=",")
+	ids <- movieData$movieId
 	l <- lapply(as.character(movieData$genres), getGenres)
 	df <-as.data.frame(do.call(rbind, l))
-	df$movieId <- 1:nrow(df)
+	df$movieId <- ids
 	df*1
 }
 
@@ -41,8 +42,8 @@ count = function(x) {
 # Contributors matrix
 getContributorsMatrix <- function(){
 	metadata <- read.csv("data/ml-latest-small/metadata.csv", header=TRUE, na.strings = "N/A")
+	ids <- metadata$movieId
 	contributors <- paste(metadata$actors, metadata$writer, metadata$director, sep=", ")
-	
 	# Remove parentheses
 	contributors <- gsub( " *\\(.*?\\) *", "", contributors)
 
@@ -59,7 +60,7 @@ getContributorsMatrix <- function(){
 	m <- Matrix(0, ncol = length(selected.names)+1, nrow=nrow(metadata), sparse=TRUE, 
 							dimnames=list(as.character(1:nrow(metadata)),c("movieId",selected.names)))	
 	
-	m[,"movieId"] <- 1:8570
+	m[,"movieId"] <- ids
 	
 	for(i in 1:length(contributors)){
 		l <- contributors[i][[1]][contributors[i][[1]] %in% colnames(m)]
@@ -88,7 +89,12 @@ getSynopsisMatrix <- function(){
 	# Only save terms that appear in 5 or more movies
 	dtm <- dtm[,findFreqTerms(dtm,5)]
 	dtm_tfidf <- weightTfIdf(dtm)
-	as.matrix(dtm_tfidf)
+	m <- as.matrix(dtm_tfidf)
+	names <- colnames(m)
+	
+	m <- cbind(m,metadata$movieId)
+	colnames(m) <- c(names, "movieId")
+	m
 }
 
 
