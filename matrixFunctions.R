@@ -97,6 +97,46 @@ getSynopsisMatrix <- function(){
 	m
 }
 
+getTagsMatrix <- function(){
+	tags <- read.csv("data/ml-latest-small/tags.csv", header=TRUE, 
+											 stringsAsFactors = FALSE, na.strings = "N/A")
+	movieData <- read.csv(file = "data/ml-latest-small/movies.csv", header = TRUE, sep=",")
+	
+	text <- tags$tag
+	corpus <- VCorpus(VectorSource(text))
+	corpus <- tm_map(corpus, content_transformer(tolower))
+	corpus <- tm_map(corpus, removeWords, stopwords("english"))
+	corpus <- tm_map(corpus, removeNumbers)
+	corpus <- tm_map(corpus, stripWhitespace)
+	corpus <- tm_map(corpus, removePunctuation)
+	corpus <- tm_map(corpus, stemDocument)
+	corpus <- tm_map(corpus, stripWhitespace)
+	
+	df<- data.frame(text=unlist(sapply(corpus, `[`, "content")), stringsAsFactors=F)
+	df$movieId <- tags$movieId
+	names(df) = c("tag", "movieId")
+	 
+	tagsByMovie <- aggregate(tag ~ movieId, df, paste)
+	 
+	taglist <- df[!duplicated(df$tag),]$tag
+	 
+	m <- Matrix(0, ncol = length(taglist)+1, nrow=nrow(metadata), sparse=TRUE, 
+							dimnames=list(as.character(1:nrow(metadata)),c("movieId",taglist)))	
+	 
+	m[,"movieId"] <- movieData$movieId
+	 
+	for(i in 1:nrow(tagsByMovie)){
+		for(j in 1:length(tagsByMovie[i,]$tag[[1]])){
+			t <- colnames(m) %in% tagsByMovie[i,]$tag[[1]][j]
+			m[i,t] = m[i,t] +1
+		}
+	}
+	 
+	as.matrix(m)
+}
+
+
+
 users <- read.csv(file = "data/ml-latest-small/ratings.csv", header = TRUE, sep=",")
 # Most active userId: 516
 
@@ -104,4 +144,4 @@ write.csv(users[users$userId == 516,], "data/ml-latest-small/biggestUser.csv", r
 write.csv(getGenreMatrix(), "data/ml-latest-small/genreMatrix.csv", row.names = FALSE)
 write.csv(getContributorsMatrix(), "data/ml-latest-small/contributorMatrix.csv", row.names = FALSE)
 write.csv(getSynopsisMatrix(), "data/ml-latest-small/synopsisMatrix.csv", row.names = FALSE)
-
+write.csv(getTagsMatrix(), "data/ml-latest-small/tagsMatrix.csv", row.names = FALSE)
