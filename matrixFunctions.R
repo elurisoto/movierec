@@ -97,7 +97,10 @@ getSynopsisMatrix <- function(){
 	m
 }
 
+users <- read.csv(file = "data/ml-latest-small/ratings.csv", header = TRUE, sep=",")
+# Most active userId: 516
 
+write.csv(users[users$userId == 516,], "data/ml-latest-small/biggestUser.csv", row.names = FALSE)
 write.csv(getGenreMatrix(), "data/ml-latest-small/genreMatrix.csv", row.names = FALSE)
 write.csv(getContributorsMatrix(), "data/ml-latest-small/contributorMatrix.csv", row.names = FALSE)
 write.csv(getSynopsisMatrix(), "data/ml-latest-small/synopsisMatrix.csv", row.names = FALSE)
