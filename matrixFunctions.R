@@ -4,6 +4,7 @@ library(data.table)
 library(Matrix)
 library(tm)
 library(SnowballC) 
+library(robCompositions)
 
 ## Genre matrix
 genres <- c("Action", "Adventure", "Animation", "Children", 
@@ -12,7 +13,8 @@ genres <- c("Action", "Adventure", "Animation", "Children",
 						"Sci-Fi", "Thriller", "War", "Western", "IMAX")
 emptyGenres = rep(FALSE, length(genres))
 names(emptyGenres) <- genres
-
+metadata <- read.csv("data/ml-latest-small/metadata.csv", header=TRUE, 
+										 stringsAsFactors = FALSE, na.strings = c("N/A",'None'))
 
 getGenres <- function(x){
 	aux = emptyGenres
@@ -71,8 +73,7 @@ getContributorsMatrix <- function(){
 }
 
 getSynopsisMatrix <- function(){
-	metadata <- read.csv("data/ml-latest-small/metadata.csv", header=TRUE, 
-											 stringsAsFactors = FALSE, na.strings = "N/A")
+	
 	text <- metadata$plot
 	text[is.na(text)] = "noplot"
 	corpus <- VCorpus(VectorSource(text))
@@ -86,8 +87,8 @@ getSynopsisMatrix <- function(){
 	
 	dtm <- DocumentTermMatrix(corpus)
 	
-	# Only save terms that appear in 5 or more movies
-	dtm <- dtm[,findFreqTerms(dtm,5)]
+	# Only save terms that appear in 15 or more movies
+	dtm <- dtm[,findFreqTerms(dtm,15)]
 	dtm_tfidf <- weightTfIdf(dtm)
 	m <- as.matrix(dtm_tfidf)
 	names <- colnames(m)
@@ -135,6 +136,10 @@ getTagsMatrix <- function(){
 	as.matrix(m)
 }
 
+onlineImputed <- impKNNa(
+	metadata[,c('movieId','imdb_rating', 'tomato_user_meter', 'FA_rating', 
+							'tomato_rating', 'tomato_user_rating')], 
+	primitive=TRUE, metric = "Euclidean", k=17)$xImp
 
 
 users <- read.csv(file = "data/ml-latest-small/ratings.csv", header = TRUE, sep=",")
@@ -145,3 +150,6 @@ write.csv(getGenreMatrix(), "data/ml-latest-small/genreMatrix.csv", row.names = 
 write.csv(getContributorsMatrix(), "data/ml-latest-small/contributorMatrix.csv", row.names = FALSE)
 write.csv(getSynopsisMatrix(), "data/ml-latest-small/synopsisMatrix.csv", row.names = FALSE)
 write.csv(getTagsMatrix(), "data/ml-latest-small/tagsMatrix.csv", row.names = FALSE)
+write.csv(metadata[,c('movieId','imdb_rating', 'tomato_user_meter','FA_rating', 'tomato_rating', 'tomato_user_rating')],
+					"data/ml-latest-small/onlineRatings.csv", row.names = FALSE)
+write.csv(onlineImputed, 'data/ml-latest-small/onlineRatingsImp.csv', row.names = FALSE)

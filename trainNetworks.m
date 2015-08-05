@@ -1,6 +1,13 @@
-function MSE = trainNetworks(data, target, iter, neurons, folds)
+function MSE = trainNetworks(data, target, iter, neurons, folds, index, k)
 
-index = crossvalind('Kfold',target,folds);
+
+% if sum(sum(isnan(data))) > 0
+%     aux = fixunknowns(data(size(data,1),:));
+%     data(size(data,1),:) = aux(1,:);
+%     data = knnimpute(data,k);
+% end
+% 
+% fprintf('knn done\n');
 
 total = 0;
 for j=1:iter
@@ -8,8 +15,7 @@ for j=1:iter
     for i = 1:folds
         t = (index == i);     %x for train data, t for test data
         x = ~t;
-
-        net = feedforwardnet(neurons);
+        net = feedforwardnet(neurons, 'trainrp');
         net = configure(net,data(:,x),target(:,x));
         net.trainParam.showWindow=0; 
         net = train(net,data(:,x),target(:,x));
@@ -20,5 +26,5 @@ for j=1:iter
     total = total + aux/folds;
 end
 
-total/iter;
+MSE = total/iter;
 
